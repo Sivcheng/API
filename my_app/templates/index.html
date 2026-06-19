@@ -1,0 +1,166 @@
+{% load static %}
+<!doctype html>
+<html lang="km">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ទម្រង់ចុះឈ្មោះសិស្ស</title>
+    <style>
+      body {
+        font-family: "Khmer OS Battambang", sans-serif;
+        padding: 20px;
+        background-color: #f4f4f9;
+      }
+      .form-container {
+        max-width: 600px;
+        margin: auto;
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      h2 {
+        text-align: center;
+        color: #333;
+      }
+      .form-group {
+        margin-bottom: 15px;
+      }
+      label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+      }
+      input[type="text"],
+      input[type="date"],
+      select {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+      }
+      .grid-row {
+        display: flex;
+        gap: 10px;
+      }
+      .grid-row > div {
+        flex: 1;
+      }
+      .photo-box {
+        border: 2px dashed #ccc;
+        width: 120px;
+        height: 160px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 10px;
+        color: #777;
+      }
+      button {
+        width: 100%;
+        padding: 10px;
+        background-color: #28a745;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+      }
+      button:hover {
+        background-color: #218838;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="form-container">
+      <h2>ទម្រង់ចុះឈ្មោះសិស្ស</h2>
+      <form action="{% url 'submit_registration' %}" method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+        <label>រូបថត (4x6):</label>
+        <div class="photo-box">រូបថត</div>
+        <input type="file" name="photo" accept="image/*" />
+
+        <div class="form-group">
+          <label>ឈ្មោះ និងនាមត្រកូល:</label>
+          <input type="text" name="full_name" required />
+        </div>
+
+        <div class="grid-row">
+          <div class="form-group">
+            <label>ភេទ:</label>
+            <select name="gender">
+              <option value="male">ប្រុស</option>
+              <option value="female">ស្រី</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>ថ្ងៃខែឆ្នាំកំណើត:</label>
+            <input type="date" name="dob" />
+          </div>
+        </div>
+
+       <form method="POST" id="location-form">
+    {% csrf_token %}
+   <label>ទីកន្លែងកំណើត:</label>
+<div class="grid-row">
+    <select id="province" name="province" onchange="loadLocation('district', this.value, 'district')">
+    <option value="">ជ្រើសរើសខេត្ត</option>
+    {% for p in provinces %}
+        <option value="{{ p.id }}">{{ p.name_km }}</option>
+    {% endfor %}
+</select>
+
+<select id="district" name="district" disabled onchange="loadLocation('commune', this.value, 'commune')">
+    <option value="">ជ្រើសរើសស្រុក</option>
+    {% for p in districts %}
+        <option value="{{ p.id }}">{{ p.name_km }}</option>
+    {% endfor %}
+</select>
+
+<select id="commune" name="commune" disabled onchange="loadLocation('village', this.value, 'village')">
+    <option value="">ជ្រើសរើសឃុំ</option>
+</select>
+
+<select id="village" name="village" disabled>
+    <option value="">ជ្រើសរើសភូមិ</option>
+</select>
+</div>
+
+        <div class="form-group">
+          <label>ឈ្មោះឪពុក:</label>
+          <input type="text" name="father_name" />
+        </div>
+        <div class="form-group">
+          <label>ឈ្មោះម្តាយ:</label>
+          <input type="text" name="mother_name" />
+        </div>
+
+        <button type="submit">ចុះឈ្មោះ</button>
+    </div>
+<script>
+    async function loadLocation(type, id, targetId) {
+        const target = document.getElementById(targetId);
+        
+        target.style.transition = "opacity 0.3s ease-in-out";
+        target.style.opacity = "0.5";
+        target.innerHTML = `<option>កំពុងផ្ទុក...</option>`;
+
+        try {
+            const response = await fetch(`/get-locations/?type=${type}&id=${id}`);
+            const data = await response.json();
+
+            target.style.opacity = "1";
+            target.innerHTML = `<option value="">-- ជ្រើសរើស --</option>`;
+            
+            data.forEach(item => {
+                target.innerHTML += `<option value="${item.id}">${item.name_km}</option>`;
+            });
+            target.disabled = false;
+        } catch (error) {
+            target.innerHTML = `<option>មានកំហុស</option>`;
+        }
+    }
+</script>
+  </body>
+</html>

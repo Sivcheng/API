@@ -1,0 +1,47 @@
+{% load static %}
+<style>
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+  th,
+  td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+  th {
+    background-color: #28a745;
+    color: white;
+  }
+  tr:hover {
+    background-color: #f1f1f1;
+  }
+</style>
+<table border="1" style="width: 100%; border-collapse: collapse">
+  <thead>
+    <tr>
+      <th>ឈ្មោះ</th>
+      <th>ភេទ</th>
+      <th>ថ្ងៃខែឆ្នាំកំណើត</th>
+      <th>ទីកន្លែងកំណើត</th>
+      <th>ឈ្មោះឪពុក</th>
+      <th>ឈ្មោះម្តាយ</th>
+      <th>រូបថត (4x6)</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for s in students %}
+  <tr>
+      <td>{{ s.full_name }}</td>
+      <td>{{ s.gender }}</td>
+      <td>{{ s.dob }}</td>
+      <td>ភូមិ៖{{ s.village_name }} ឃុំ៖{{ s.commune_name }} ស្រុក៖{{ s.district_name }} ខេត្ត៖{{ s.province_name }}</td>
+      <td>{{ s.father_name }}</td>
+      <td>{{ s.mother_name }}</td>
+      <td>{{ s.photo }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
